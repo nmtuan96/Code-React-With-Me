@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Like from './like';
 import Table from './table';
+import { Link } from 'react-router-dom';
 
 class StudentTable extends Component {
     
     columns = [
-        { path: 'name', label: 'Name'},
+        { path: 'name', label: 'Name', content: student => <Link to={`/student/${student._id}`}  >{student.name}</Link>},
         { path: 'class.name', label: 'Class'},
         { path: 'age', label: 'Age'},
         { path: 'hobbies', label: 'Hobbies'},
