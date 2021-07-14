@@ -6,6 +6,8 @@ import { paginate } from '../utils/paginate.js';
 import { getClass } from '../services/classService';
 import StudentTable from './common/studentTable';
 import _ from 'lodash';
+import { Link } from 'react-router-dom';
+import SearchBox from './searchBox';
 
 class Students extends Component{
     state = {
@@ -13,6 +15,7 @@ class Students extends Component{
         classes: [],
         currentPage: 1,
         pageSize: 4,
+        searchQuery: "",
         sortColumn: {path:'title', order: 'asc'}
     };
 
@@ -46,16 +49,26 @@ class Students extends Component{
         this.setState({ sortColumn });
     };
     getPageData =() =>{
-        const { pageSize, currentPage, sortColumn ,students: allStudents, selectedClass } = this.state;
-        const filtered = selectedClass && selectedClass._id ? allStudents.filter(m => m.class._id === selectedClass._id) : allStudents;
+        const { pageSize, currentPage, sortColumn ,students: allStudents, selectedClass, searchQuery } = this.state;
+        let filtered = allStudents;
+        if (searchQuery){
+            filtered = allStudents.filter(m =>
+                m.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+                );
+        }else if (selectedClass && selectedClass._id){
+            filtered = allStudents.filter(m => m.class._id === selectedClass._id);
+        }
         const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
         const students = paginate(sorted, currentPage, pageSize);
         return {totalCount: filtered.length , data: students };
     }
+    handleSearch = query => {
+        this.setState({ searchQuery: query, selectedClass: null, currentPage: 1});
+    }
 
     render() {
         const { length: count } = this.state.students;
-        const { pageSize, currentPage, sortColumn} = this.state;
+        const { pageSize, currentPage, sortColumn, searchQuery} = this.state;
 
         const {totalCount, data: students} = this.getPageData();
         if( count === 0 ) return <p>There are no student!</p>
@@ -69,7 +82,14 @@ class Students extends Component{
                     />
                 </div>
                 <div className="col">
+                    <Link 
+                        to="/students/new" 
+                        className="btn btn-primary"
+                    >
+                        New Student
+                    </Link>
                     <p>total {totalCount} current.</p>
+                    <SearchBox value={searchQuery} onChange={this.handleSearch}/>
                     <StudentTable 
                         students={students} 
                         onDelete={this.handleDelete}

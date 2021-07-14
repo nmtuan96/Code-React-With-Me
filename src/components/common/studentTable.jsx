@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 class StudentTable extends Component {
     
     columns = [
-        { path: 'name', label: 'Name', content: student => <Link to={`/student/${student._id}`}  >{student.name}</Link>},
+        { path: 'name', label: 'Name', content: student => <Link to={`/students/${student._id}`}  >{student.name}</Link>},
         { path: 'class.name', label: 'Class'},
         { path: 'age', label: 'Age'},
         { path: 'hobbies', label: 'Hobbies'},
